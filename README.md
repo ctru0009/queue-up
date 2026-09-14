@@ -36,10 +36,15 @@ succeeded.
 |---|---|---|---|
 | ![Events](docs/screenshots/events.png) | ![Checked in](docs/screenshots/checked-in.png) | ![Squad ready](docs/screenshots/squad-ready.png) | ![Match ready](docs/screenshots/match-ready.png) |
 
-<!-- RECORDING -->
-A 45–70 second screen recording of the full acceptance flow — including temporary API
-unreachability, retained data, Retry, and recovery — is linked here: **<recording link>**
-<!-- /RECORDING -->
+### Acceptance recording
+
+[Watch the 60-second acceptance recording](queueup-demo.mp4) — committed as `queueup-demo.mp4`.
+
+It covers the full flow end to end: the three event summaries, the featured event detail, the
+squad at `4 of 5 ready`, check-in returning the `B11–B15` station assignment, marking ready, the
+squad then reflecting `5 of 5 ready` without refetching, and finally a suspended API process — a
+failed pull-to-refresh that keeps the confirmed data on screen behind a persistent Retry notice,
+the same process resuming, and the notice clearing while the confirmed state survives.
 
 ## Architecture
 

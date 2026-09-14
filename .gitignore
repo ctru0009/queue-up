@@ -27,10 +27,12 @@ mobile/android/key.properties
 *.ipa
 mobile/build/app/outputs/flutter-apk/
 
-# Demonstration video (hosted externally, linked from README)
+# Demonstration video. The acceptance recording is committed on purpose so the
+# README link resolves from a single repository; any other stray video stays out.
 *.mp4
 *.mov
 *.webm
+!queueup-demo.mp4
 
 # Agent / tooling artifacts that are not part of the product
 .agents/
