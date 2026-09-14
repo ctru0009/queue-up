@@ -200,10 +200,12 @@ npm run typecheck
 npm test
 ```
 
-- **API tests** (16) run against the real Fastify instance through `app.inject()`: seed shape and
+- **API tests** (18) run against the real Fastify instance through `app.inject()`: seed shape and
   ordering, featured derivation, unknown-resource `404`s, the safe error shape, check-in
   idempotency (same stations, original `checkedInAt`), the mandatory
-  `ready → 409 → check-in → ready → 5/5 → ready` sequence, fresh-state isolation between two
+  `ready → 409 → check-in → ready → 5/5 → ready` sequence, the terminal-status guard for an
+  `in_progress` or `complete` match (arranged through a narrow `buildServer({ initialState })`
+  seam, since no endpoint can produce those statuses), fresh-state isolation between two
   `buildServer()` calls, and a `500` path that must not leak internals.
 - **Flutter tests** (54) cover strict `fromJson` parsing (malformed JSON, wrong types, missing
   required fields, unknown match status), timestamp and station formatting, `ApiClient` status /
@@ -326,8 +328,8 @@ can point at a LAN host without editing code.
 
 - Three screens share a small private `_statusChip` helper rather than a shared widget, keeping
   each screen self-contained at the cost of ~20 duplicated lines.
-- The `409` branch for a match already `in_progress` or `complete` is implemented but unreachable
-  through the public API, because no endpoint advances a match past `ready`. It is deliberately
-  left untested rather than adding a test-only mutation endpoint.
+- A match already `in_progress` or `complete` is refused with `409`, but the public API can never
+  move a match into those statuses — nothing advances a match past `ready` — so that guard is
+  exercised by injecting a locked initial state into `buildServer()` rather than over HTTP.
 - Timestamps are rendered in venue wall-clock time for the fixed `+10:00` seed offset so the demo
   reads correctly on any machine time zone; see the localisation note above.

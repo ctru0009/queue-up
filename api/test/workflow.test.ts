@@ -8,6 +8,7 @@ import {
   type Event,
   type Match,
   type MatchStatus,
+  type SeedState,
   type Squad,
 } from "../src/app.js";
 
@@ -408,6 +409,70 @@ test("ready for an unknown match returns the safe 404 body", async () => {
   });
 });
 
+/**
+ * Builds a checked-in, fully assigned state whose match sits in a status the
+ * public workflow cannot produce: no endpoint advances a match past `ready`.
+ * Ready-decision step 1 returns early when the current player is already ready,
+ * so reaching the terminal-status guard requires a locked match in which the
+ * current player has not readied.
+ */
+function lockedMatchState(status: MatchStatus): SeedState {
+  return {
+    events: [
+      {
+        ...featuredEvent,
+        checkedIn: true,
+        checkedInAt: "2026-09-18T19:05:00+10:00",
+        stations: [...REQUIRED_STATIONS],
+      },
+    ],
+    squads: [
+      {
+        ...fiveStack,
+        players: fiveStack.players.map((player) => ({ ...player })),
+      },
+    ],
+    matches: [{ ...roundTwoMatch, status, stations: [...REQUIRED_STATIONS], readyCount: 4 }],
+  };
+}
+
+for (const status of ["in_progress", "complete"] as const) {
+  test(`ready is refused while the match is ${status} and mutates nothing`, async () => {
+    const app = buildServer({ logger: false, initialState: lockedMatchState(status) });
+    try {
+      const response = await app.inject({
+        method: "POST",
+        url: "/matches/match-round-2/ready",
+      });
+
+      assert.equal(response.statusCode, 409);
+      assert.equal(
+        response.body,
+        JSON.stringify({
+          error: "MATCH_LOCKED",
+          message: "Readiness is closed for this match.",
+        }),
+      );
+
+      // The rejected transition left every entity exactly as it was.
+      const match = (
+        await app.inject({ method: "GET", url: "/matches/match-round-2" })
+      ).json<Match>();
+      assert.equal(match.status, status);
+      assert.equal(match.readyCount, 4);
+
+      const squad = (
+        await app.inject({ method: "GET", url: "/squads/squad-five-stack" })
+      ).json<Squad>();
+      const currentPlayer = squad.players.find((player) => player.isCurrentUser);
+      assert.equal(currentPlayer?.isReady, false);
+      assert.equal(squad.players.filter((player) => player.isReady).length, 4);
+    } finally {
+      await app.close();
+    }
+  });
+}
+
 test("two buildServer instances keep independent state", async () => {
   const mutated = buildServer({ logger: false });
   const pristine = buildServer({ logger: false });
@@ -443,12 +508,12 @@ test("two buildServer instances keep independent state", async () => {
 
 test("match status serialized by the API always comes from the frozen wire enum", async () => {
   await withServer(async (app) => {
-    // Documented limitation: the frozen seed cannot reach `in_progress` or
-    // `complete` through the public API — no endpoint advances a match past
-    // `ready` — so the terminal-status 409 branch is unreachable over HTTP and
-    // is not exercised here. This test asserts everything observable: every
-    // serialized status belongs to the frozen wire enum, and only the two
-    // reachable values ever appear, even after the full workflow.
+    // The frozen seed cannot reach `in_progress` or `complete` through the
+    // public API — no endpoint advances a match past `ready` — so this test
+    // covers what the default seed can observe end to end: every serialized
+    // status belongs to the frozen wire enum, and only the two reachable values
+    // ever appear, even after the full workflow. The terminal-status guard
+    // itself is covered separately by injecting a locked match.
     const initial = await app.inject({ method: "GET", url: "/matches/match-round-2" });
     const initialStatus = initial.json<Match>().status;
     assert.equal(initialStatus, "scheduled");

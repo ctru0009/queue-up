@@ -3,6 +3,12 @@ import Fastify, { type FastifyInstance } from "fastify";
 export interface BuildServerOptions {
   /** Fastify request/error logging. Disabled by tests to keep output readable. */
   logger?: boolean;
+  /**
+   * State for this server instance. Defaults to fresh deterministic fixtures;
+   * tests inject a state to reach match statuses the public workflow cannot
+   * produce. Omitted, every call still owns brand-new seed state.
+   */
+  initialState?: SeedState;
 }
 
 export interface Event {
@@ -200,7 +206,7 @@ export function createSeedState(): SeedState {
 /** Builds the QueueUp API with fresh in-memory seed state. */
 export function buildServer(options: BuildServerOptions = {}): FastifyInstance {
   const app = Fastify({ logger: options.logger ?? true });
-  const state = createSeedState();
+  const state = options.initialState ?? createSeedState();
 
   app.setErrorHandler((error, request, reply) => {
     // Technical detail stays server-side; the client only sees safe copy.
