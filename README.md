@@ -38,16 +38,17 @@ succeeded.
 
 ### Acceptance recording
 
-[Watch the acceptance recording](queueup-demo.mp4) — `queueup-demo.mp4`, 60 seconds, 2.6 MB.
+![QueueUp acceptance flow, playing inline](queueup-demo.gif)
 
-GitHub serves MP4 files from a repository as a download page rather than an inline player, so
-open that link and use **Download raw file** to play it.
+The whole flow, playing inline: the three event summaries, the featured event detail, the squad at
+`4 of 5 ready`, check-in returning the `B11–B15` station assignment, marking ready, the squad then
+reflecting `5 of 5 ready` without refetching, and finally a suspended API process — a failed
+pull-to-refresh that keeps the confirmed data on screen behind a persistent Retry notice, the same
+process resuming, and the notice clearing while the confirmed state survives.
 
-It covers the full flow end to end: the three event summaries, the featured event detail, the
-squad at `4 of 5 ready`, check-in returning the `B11–B15` station assignment, marking ready, the
-squad then reflecting `5 of 5 ready` without refetching, and finally a suspended API process — a
-failed pull-to-refresh that keeps the confirmed data on screen behind a persistent Retry notice,
-the same process resuming, and the notice clearing while the confirmed state survives.
+The GIF is 720×1600 and loops, and GIFs cannot be paused or scrubbed. For full 1080×2400 fidelity,
+[download `queueup-demo.mp4`](queueup-demo.mp4) (2.6 MB) instead — GitHub shows repository MP4s as a
+download page rather than an inline player, so use **Download raw file** there.
 
 ## Architecture
 
