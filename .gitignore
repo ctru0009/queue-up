@@ -1,0 +1,39 @@
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.iml
+*.swp
+
+# Node / TypeScript
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Dart / Flutter
+mobile/.dart_tool/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/build/
+mobile/android/.gradle/
+mobile/android/local.properties
+mobile/android/key.properties
+.packages
+*.lock.bak
+
+# Build outputs that must never be committed
+*.apk
+*.aab
+*.ipa
+mobile/build/app/outputs/flutter-apk/
+
+# Demonstration video (hosted externally, linked from README)
+*.mp4
+*.mov
+*.webm
+
+# Agent / tooling artifacts that are not part of the product
+.agents/
+.opencode/
+docs/superpowers/
+*.transcript
