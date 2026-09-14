@@ -38,7 +38,10 @@ succeeded.
 
 ### Acceptance recording
 
-[Watch the 60-second acceptance recording](queueup-demo.mp4) — committed as `queueup-demo.mp4`.
+<video src="queueup-demo.mp4" controls muted width="360"></video>
+
+If the inline player does not appear, [download and play `queueup-demo.mp4`](queueup-demo.mp4)
+(2.6 MB, 60 seconds).
 
 It covers the full flow end to end: the three event summaries, the featured event detail, the
 squad at `4 of 5 ready`, check-in returning the `B11–B15` station assignment, marking ready, the
